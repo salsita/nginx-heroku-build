@@ -3,9 +3,8 @@
 ## About
 
 * Dynamically linked, with lua, http2, geoip etc., built in Heroku build docker images.
-* Bins committed to the repository, being downloaded by Heroku runtime (saving bucks on S3 traffic).
-* Comes with `mime.types`.
-* *Be careful what you do on master branch.*
+* Bins committed to the repository, being downloaded from *releases* by Heroku runtime (saving bucks on S3 traffic).
+* Comes with `mime.types`, also included in releaes.
 * Nginx compile options changable in `scripts/build-nginx.sh`.
 * Inspired by https://github.com/Americastestkitchen/heroku-buildpack-nginx
 
@@ -50,12 +49,12 @@ mkdir -p /tmp/nginx/log
 
 ( tail -qF -n 0 /tmp/nginx/log/*.log ) & # get nginx logs directly into Heroku logs
 
-curl -sSL https://github.com/salsita/nginx-heroku-build/raw/master/bin/nginx-heroku-20 \
-  > nginx
-chmod +x nginx
+curl -sSL https://github.com/salsita/nginx-heroku-build/releases/download/v1.0/nginx-heroku-20 \
+   > nginx
+ chmod +x nginx
 
-curl -sSL https://raw.githubusercontent.com/salsita/nginx-heroku-build/master/mime.types \
-  > heroku/mime.types
+curl -sSL https://github.com/salsita/nginx-heroku-build/releases/download/v1.0/mime.types \
+   > heroku/mime.types
 
 echo Starting nginx
 ./nginx -p . -c heroku/nginx.conf
