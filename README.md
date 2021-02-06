@@ -7,6 +7,7 @@
 * Comes with `mime.types`.
 * *Be careful what you do on master branch.*
 * Nginx compile options changable in `scripts/build-nginx.sh`.
+* Inspired by https://github.com/Americastestkitchen/heroku-buildpack-nginx
 
 ## Usage
 
@@ -25,7 +26,7 @@ It uses latest nginx available (`1.19.6` at the time of update), a bit older gcc
 and lua in order to run nginx with lua without any other dependencies needed (LuaJIT2 e.g.).
 *Compatible with heroku-18 stack.*
 
-### Current nginx Heroku 20 runtime requirements:
+### Current nginx Heroku 20 runtime requirements
 
 * Folder `/tmp/nginx/log`.
 
@@ -35,11 +36,29 @@ and lua in order to run nginx with lua without any other dependencies needed (Lu
 ./nginx -p . -c </path/to/conf>
 ```
 
-* `mime.types` must be in the same folder as the configuration file is.
-
 ### Working example
 
 ```
+#!/bin/bash
+
+set -e
+
+erb heroku/nginx.conf.erb > heroku/nginx.conf
+
+mkdir -p /tmp/nginx/log
+( cd /tmp/nginx/log && touch access.log error.log )
+
+( tail -qF -n 0 /tmp/nginx/log/*.log ) & # get nginx logs directly into Heroku logs
+
+curl -sSL https://github.com/salsita/nginx-heroku-build/raw/master/bin/nginx-heroku-20 \
+  > nginx
+chmod +x nginx
+
+curl -sSL https://raw.githubusercontent.com/salsita/nginx-heroku-build/master/mime.types \
+  > heroku/mime.types
+
+echo Starting nginx
+./nginx -p . -c heroku/nginx.conf
 ```
 
 * `heroku/nginx.conf` contains full nginx configuration (as `/etc/nginx/nginx.con` does, sites included).
